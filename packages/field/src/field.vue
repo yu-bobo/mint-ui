@@ -66,6 +66,7 @@ if (process.env.NODE_ENV === 'component') {
  * @param {string} [disabled] - disabled
  * @param {string} [readonly] - readonly
  * @param {string} [state] - 表单校验状态样式，接受 error, warning, success
+ * @param {string} [Boolean] - 是否允许输入表情 true为允许
  *
  * @example
  * <mt-field v-model="value" label="用户名"></mt-field>
@@ -79,7 +80,8 @@ export default {
   data() {
     return {
       active: false,
-      currentValue: this.value
+      currentValue: this.value,
+      emojiReg: /[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF][\u200D|\uFE0F]|[\uD83C|\uD83D|\uD83E][\uDC00-\uDFFF]|[0-9|*|#]\uFE0F\u20E3|[0-9|#]\u20E3|[\u203C-\u3299]\uFE0F\u200D|[\u203C-\u3299]\uFE0F|[\u2122-\u2B55]|\u303D|[\A9|\AE]\u3030|\uA9|\uAE|\u3030/ig
     };
   },
 
@@ -101,6 +103,10 @@ export default {
     state: {
       type: String,
       default: 'default'
+    },
+    emoji: {
+      type: Boolean,
+      default: false
     },
     value: {},
     attr: Object
@@ -125,7 +131,11 @@ export default {
 
   watch: {
     value(val) {
-      this.currentValue = val;
+      if (!this.emoji && typeof val === 'string') {
+        this.currentValue = val.replace(this.emojiReg, '');
+      } else {
+        this.currentValue = val;
+      }
     },
 
     currentValue(val) {
